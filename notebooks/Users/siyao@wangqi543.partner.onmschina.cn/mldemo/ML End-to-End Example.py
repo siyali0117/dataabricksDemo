@@ -37,7 +37,7 @@ data.head()
 
 # MAGIC %md
 # MAGIC ## Visualize data
-# MAGIC 
+# MAGIC
 # MAGIC Before training a model, explore the dataset using Seaborn and Matplotlib.
 
 # COMMAND ----------
@@ -54,7 +54,7 @@ sns.distplot(data.quality, kde=False)
 
 # MAGIC %md
 # MAGIC Looks like quality scores are normally distributed between 3 and 9. 
-# MAGIC 
+# MAGIC
 # MAGIC Define a wine as high quality if it has quality >= 7.
 
 # COMMAND ----------
@@ -88,7 +88,7 @@ for col in data.columns:
 
 # MAGIC %md
 # MAGIC In the above box plots, a few variables stand out as good univariate predictors of quality. 
-# MAGIC 
+# MAGIC
 # MAGIC - In the alcohol box plot, the median alcohol content of high quality wines is greater than even the 75th quantile of low quality wines. High alcohol content is correlated with quality.
 # MAGIC - In the density box plot, low quality wines have a greater density than high quality wines. Density is inversely correlated with quality.
 
@@ -134,7 +134,7 @@ X_val, X_test, y_val, y_test = train_test_split(X_rem, y_rem, test_size=0.5, ran
 # MAGIC %md
 # MAGIC ## Build a baseline model
 # MAGIC This task seems well suited to a random forest classifier, since the output is binary and there may be interactions between multiple variables.
-# MAGIC 
+# MAGIC
 # MAGIC The following code builds a simple classifier using scikit-learn. It uses MLflow to keep track of the model accuracy, and to save the model for later use.
 
 # COMMAND ----------
@@ -207,18 +207,18 @@ feature_importances.sort_values('importance', ascending=False)
 
 # MAGIC %md
 # MAGIC You logged the Area Under the ROC Curve (AUC) to MLflow. Click **Experiment** at the upper right to display the Experiment Runs sidebar. 
-# MAGIC 
+# MAGIC
 # MAGIC The model achieved an AUC of 0.854.
-# MAGIC 
+# MAGIC
 # MAGIC A random classifier would have an AUC of 0.5, and higher AUC values are better. For more information, see [Receiver Operating Characteristic Curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Area_under_the_curve).
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC #### Register the model in MLflow Model Registry
-# MAGIC 
+# MAGIC
 # MAGIC By registering this model in Model Registry, you can easily reference the model from anywhere within Databricks.
-# MAGIC 
+# MAGIC
 # MAGIC The following section shows how to do this programmatically, but you can also register a model using the UI. See "Create or register a model using the UI" ([AWS](https://docs.databricks.com/applications/machine-learning/manage-model-lifecycle/index.html#create-or-register-a-model-using-the-ui)|[Azure](https://docs.microsoft.com/azure/databricks/applications/machine-learning/manage-model-lifecycle/index#create-or-register-a-model-using-the-ui)|[GCP](https://docs.gcp.databricks.com/applications/machine-learning/manage-model-lifecycle/index.html#create-or-register-a-model-using-the-ui)).
 
 # COMMAND ----------
@@ -239,7 +239,7 @@ time.sleep(15)
 
 # MAGIC %md
 # MAGIC You should now see the model in the Models page. To display the Models page, click the Models icon in the left sidebar. 
-# MAGIC 
+# MAGIC
 # MAGIC Next, transition this model to production and load it into this notebook from Model Registry.
 
 # COMMAND ----------
@@ -257,7 +257,7 @@ client.transition_model_version_stage(
 
 # MAGIC %md
 # MAGIC The Models page now shows the model version in stage "Production".
-# MAGIC 
+# MAGIC
 # MAGIC You can now refer to the model using the path "models:/wine_quality/production".
 
 # COMMAND ----------
@@ -271,9 +271,9 @@ print(f'AUC: {roc_auc_score(y_test, model.predict(X_test))}')
 
 # MAGIC %md
 # MAGIC ##Experiment with a new model
-# MAGIC 
+# MAGIC
 # MAGIC The random forest model performed well even without hyperparameter tuning.
-# MAGIC 
+# MAGIC
 # MAGIC The following code uses the xgboost library to train a more accurate model. It runs a parallel hyperparameter sweep to train multiple
 # MAGIC models in parallel, using Hyperopt and SparkTrials. As before, the code tracks the performance of each parameter configuration with MLflow.
 
@@ -346,7 +346,7 @@ print(f'AUC of Best Run: {best_run["metrics.auc"]}')
 
 # MAGIC %md
 # MAGIC #### Update the production `wine_quality` model in MLflow Model Registry
-# MAGIC 
+# MAGIC
 # MAGIC Earlier, you saved the baseline model to Model Registry with the name `wine_quality`. Now that you have a created a more accurate model, update `wine_quality`.
 
 # COMMAND ----------
@@ -360,7 +360,7 @@ time.sleep(15)
 
 # MAGIC %md
 # MAGIC Click **Models** in the left sidebar to see that the `wine_quality` model now has two versions. 
-# MAGIC 
+# MAGIC
 # MAGIC The following code promotes the new version to production.
 
 # COMMAND ----------
@@ -399,9 +399,9 @@ print(f'AUC: {roc_auc_score(y_test, model.predict(X_test))}')
 
 # MAGIC %md
 # MAGIC ##Batch inference
-# MAGIC 
+# MAGIC
 # MAGIC There are many scenarios where you might want to evaluate a model on a corpus of new data. For example, you may have a fresh batch of data, or may need to compare the performance of two models on the same corpus of data.
-# MAGIC 
+# MAGIC
 # MAGIC The following code evaluates the model on data stored in a Delta table, using Spark to run the computation in parallel.
 
 # COMMAND ----------
@@ -456,9 +456,9 @@ display(new_data)
 
 # MAGIC %md
 # MAGIC ## Model serving
-# MAGIC 
+# MAGIC
 # MAGIC To productionize the model for low latency predictions, use MLflow Model Serving ([AWS](https://docs.databricks.com/applications/mlflow/model-serving.html)|[Azure](https://docs.microsoft.com/azure/databricks/applications/mlflow/model-serving)|[GCP](https://docs.gcp.databricks.com/applications/mlflow/model-serving.html)) to deploy the model to an endpoint.
-# MAGIC 
+# MAGIC
 # MAGIC The following code illustrates how to issue requests using a REST API to get predictions from the deployed model.
 
 # COMMAND ----------
@@ -475,9 +475,9 @@ os.environ["DATABRICKS_TOKEN"] = "dapie7427fcbe8bacdf32d205f159a88256c-2"
 
 # MAGIC %md
 # MAGIC Click **Models** in the left sidebar and navigate to the registered wine model. Click the serving tab, and then click **Enable Serving**.
-# MAGIC 
+# MAGIC
 # MAGIC Then, under **Call The Model**, click the **Python** button to display a Python code snippet to issue requests. Copy the code into this notebook. It should look similar to the code in the next cell. 
-# MAGIC 
+# MAGIC
 # MAGIC You can use the token to make these requests from outside Databricks notebooks as well.
 
 # COMMAND ----------
@@ -488,8 +488,9 @@ import requests
 import pandas as pd
 
 def score_model(dataset: pd.DataFrame):
-  url = 'https://adb-5150469131807144.4.azuredatabricks.net/model/wine_quality/Production/invocations'
-  headers = {'Authorization': f'Bearer {os.environ.get("DATABRICKS_TOKEN")}'}
+  url = 'https://adb-8965833555996390.2.databricks.azure.cn/model/wine_quality/Staging/invocations'
+  token = 'dapi699dd7a6e3a8dd8c05634651c42b0506'
+  headers = {'Authorization': f'Bearer {token}'}
   data_json = dataset.to_dict(orient='split')
   response = requests.request(method='POST', headers=headers, url=url, json=data_json)
   if response.status_code != 200:
@@ -512,3 +513,6 @@ pd.DataFrame({
   "Model Prediction": model_evaluations,
   "Served Model Prediction": served_predictions,
 })
+
+# COMMAND ----------
+
